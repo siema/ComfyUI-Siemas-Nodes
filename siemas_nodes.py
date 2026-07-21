@@ -129,6 +129,10 @@ class Siema_Get_List_Random:
             Siema_Get_List_Random.currentSeed = seed
 
         return (random.choice(list),random.choice(list),)
+
+    @classmethod
+    def IS_CHANGED(self):
+        return float("NaN")
         
 class Siema_Set_Metadata:
 
@@ -178,6 +182,7 @@ class Siema_String_List:
                 "string_6": ("STRING", {"forceInput": True}),
                 "string_7": ("STRING", {"forceInput": True}),
                 "string_8": ("STRING", {"forceInput": True}),
+                "string_9": ("STRING", {"forceInput": True}),
             }
         }
     RETURN_TYPES = ("LIST",)
@@ -185,7 +190,7 @@ class Siema_String_List:
 
     CATEGORY = "Siemas Nodes"
 
-    def run(self, string_1, string_2=None, string_3=None, string_4=None, string_5=None, string_6=None, string_7=None, string_8=None):
+    def run(self, string_1, string_2=None, string_3=None, string_4=None, string_5=None, string_6=None, string_7=None, string_8=None, string_9=None):
 
         string_list = [string_1,]
 
@@ -203,6 +208,8 @@ class Siema_String_List:
             string_list.append(string_7)
         if string_8 is not None:
             string_list.append(string_8)
+        if string_9 is not None:
+            string_list.append(string_9)
 
         return (string_list,)
         
