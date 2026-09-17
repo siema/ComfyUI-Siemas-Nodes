@@ -100,9 +100,7 @@ class Siema_Get_List:
     def main(self, list, index):
         return (list[index],)
         
-class Siema_Get_List_Random:
-
-    currentSeed = 0
+class Siema_Create_RNG:
 
     def __init__(self):
         pass
@@ -113,25 +111,50 @@ class Siema_Get_List_Random:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "list": ("LIST", {"forceInput": True}),
                 "seed": ("INT", {"forceInput": True})
             }
         }
         
-    RETURN_TYPES = (AnyType("*"),AnyType("*"),)
-    RETURN_NAMES = ("value1","value2",)
+    RETURN_TYPES = (AnyType("*"),)
+    RETURN_NAMES = ("rng",)
     FUNCTION = "main"
 
-    def main(self, list, seed):
+    def main(self, seed):
 
-        if seed != Siema_Get_List_Random.currentSeed:
-            random.seed(seed)
-            Siema_Get_List_Random.currentSeed = seed
+        rng = random.Random()
+        rng.seed(seed)
 
-        return (random.choice(list),random.choice(list),)
+        return (rng,)
 
     @classmethod
-    def IS_CHANGED(self):
+    def IS_CHANGED(self, seed):
+        return float("NaN")
+        
+class Siema_Get_List_Random:
+
+    def __init__(self):
+        pass
+        
+    CATEGORY="Siemas Nodes"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "rng": (AnyType("*"), {"forceInput": True}),
+                "list": ("LIST", {"forceInput": True}),
+            }
+        }
+        
+    RETURN_TYPES = (AnyType("*"),)
+    RETURN_NAMES = ("value",)
+    FUNCTION = "main"
+
+    def main(self, list, rng):
+        return (rng.choice(list),)
+
+    @classmethod
+    def IS_CHANGED(self, list, rng):
         return float("NaN")
         
 class Siema_Set_Metadata:
@@ -239,14 +262,54 @@ class Siema_Multiple_String_Replace:
             string = string.replace(find_list[i], replace_list[i])
 
         return (string,)
+        
+class Siema_Data_Select:
+
+    def __init__(self):
+        pass
+
+    CATEGORY="Siemas Nodes"
+    
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "test_value": ("STRING",),
+                "prefix_for_a": ("STRING",),
+                "a_positive_prompt": ("STRING", {"forceInput": True}),
+                "a_negative_prompt": ("STRING", {"forceInput": True}),
+                "a_lora_strength": ("FLOAT", {"forceInput": True}),
+                "a_steps": ("INT", {"forceInput": True}),
+                "a_cfg": ("FLOAT", {"forceInput": True}),
+                "a_sampler": ("STRING", {"forceInput": True}),
+                "b_positive_prompt": ("STRING", {"forceInput": True}),
+                "b_negative_prompt": ("STRING", {"forceInput": True}),
+                "b_lora_strength": ("FLOAT", {"forceInput": True}),
+                "b_steps": ("INT", {"forceInput": True}),
+                "b_cfg": ("FLOAT", {"forceInput": True}),
+                "b_sampler": ("STRING", {"forceInput": True}),
+            },
+        }
+    RETURN_TYPES = ("STRING","STRING","FLOAT","INT","FLOAT","FLOAT","STRING",)
+    RETURN_NAMES = ("positive_prompt","negative_prompt","lora_strength","steps","cfg","upscale_cfg","sampler",)
+    FUNCTION = "main"
+    
+    def main(self, test_value, prefix_for_a, a_positive_prompt, a_negative_prompt, a_lora_strength, a_steps, a_cfg, a_sampler, b_positive_prompt, b_negative_prompt, b_lora_strength, b_steps, b_cfg, b_sampler):
+
+        if test_value.startswith(prefix_for_a):
+            return (a_positive_prompt, a_negative_prompt, a_lora_strength, a_steps, a_cfg, a_cfg-0.5, a_sampler,)
+        else:
+            return (b_positive_prompt, b_negative_prompt, b_lora_strength, b_steps, b_cfg, b_cfg-0.5, b_sampler,)
 
 NODE_CLASS_MAPPINGS = {
     "Multiply Resolution (Siema)": Siema_Res_Multiply,
     "Absolute Value (Siema)": Siema_Int_Abs,
     "Split String By Lines (Siema)": Siema_Str2List_by_Newline,
     "Get List Item (Siema)": Siema_Get_List,
+    "Create RNG (Siema)": Siema_Create_RNG,
     "Get Random List Item (Siema)": Siema_Get_List_Random,
     "Set Metadata (Siema)": Siema_Set_Metadata,
     "String List (Siema)": Siema_String_List,
     "Multiple Replace (Siema)": Siema_Multiple_String_Replace,
+    "Data Selector (Siema)": Siema_Data_Select,
 }
