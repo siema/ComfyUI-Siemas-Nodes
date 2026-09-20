@@ -61,7 +61,7 @@ class Siema_Str2List_by_Newline:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "string": ("STRING", {"forceInput": True})
+                "string": ("STRING", {"default": "", "forceInput": True})
             }
         }
         
@@ -111,7 +111,7 @@ class Siema_Create_RNG:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "seed": ("INT", {"forceInput": True})
+                "seed": ("INT", {"default": 0, "forceInput": True})
             }
         }
         
@@ -169,8 +169,8 @@ class Siema_Set_Metadata:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "name": ("STRING",),
-                "value": ("STRING", {"forceInput": True, "default": ""}),
+                "name": ("STRING", {"default": ""}),
+                "value": ("STRING", {"default": "", "forceInput": True}),
             },
             "hidden": {
                 "extra_pnginfo": "EXTRA_PNGINFO"
@@ -195,17 +195,17 @@ class Siema_String_List:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "string_1": ("STRING", {"forceInput": True}),
+                "string_1": ("STRING", {"default": "", "forceInput": True}),
             },
             "optional": {
-                "string_2": ("STRING", {"forceInput": True}),
-                "string_3": ("STRING", {"forceInput": True}),
-                "string_4": ("STRING", {"forceInput": True}),
-                "string_5": ("STRING", {"forceInput": True}),
-                "string_6": ("STRING", {"forceInput": True}),
-                "string_7": ("STRING", {"forceInput": True}),
-                "string_8": ("STRING", {"forceInput": True}),
-                "string_9": ("STRING", {"forceInput": True}),
+                "string_2": ("STRING", {"default": "", "forceInput": True}),
+                "string_3": ("STRING", {"default": "", "forceInput": True}),
+                "string_4": ("STRING", {"default": "", "forceInput": True}),
+                "string_5": ("STRING", {"default": "", "forceInput": True}),
+                "string_6": ("STRING", {"default": "", "forceInput": True}),
+                "string_7": ("STRING", {"default": "", "forceInput": True}),
+                "string_8": ("STRING", {"default": "", "forceInput": True}),
+                "string_9": ("STRING", {"default": "", "forceInput": True}),
             }
         }
     RETURN_TYPES = ("LIST",)
@@ -247,7 +247,7 @@ class Siema_Multiple_String_Replace:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "string": ("STRING", {"forceInput": True}),
+                "string": ("STRING", {"default": "", "forceInput": True}),
                 "find_list": ("LIST", {"forceInput": True}),
                 "replace_list": ("LIST", {"forceInput": True}),
             },
@@ -268,38 +268,96 @@ class Siema_Data_Select:
     def __init__(self):
         pass
 
-    CATEGORY="Siemas Nodes"
+    CATEGORY = "Siemas Nodes"
     
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "test_value": ("STRING",),
-                "prefix_for_a": ("STRING",),
-                "a_positive_prompt": ("STRING", {"forceInput": True}),
-                "a_negative_prompt": ("STRING", {"forceInput": True}),
-                "a_lora_strength": ("FLOAT", {"forceInput": True}),
-                "a_steps": ("INT", {"forceInput": True}),
-                "a_cfg": ("FLOAT", {"forceInput": True}),
-                "a_sampler": ("STRING", {"forceInput": True}),
-                "b_positive_prompt": ("STRING", {"forceInput": True}),
-                "b_negative_prompt": ("STRING", {"forceInput": True}),
-                "b_lora_strength": ("FLOAT", {"forceInput": True}),
-                "b_steps": ("INT", {"forceInput": True}),
-                "b_cfg": ("FLOAT", {"forceInput": True}),
-                "b_sampler": ("STRING", {"forceInput": True}),
+                "should_output_a": ("BOOLEAN", {"default": True}),
             },
+            "optional": {
+                "a_value": (AnyType("*"), {"forceInput": True, "lazy": True}),
+                "b_value": (AnyType("*"), {"forceInput": True, "lazy": True}),
+            }
         }
-    RETURN_TYPES = ("STRING","STRING","FLOAT","INT","FLOAT","FLOAT","STRING",)
-    RETURN_NAMES = ("positive_prompt","negative_prompt","lora_strength","steps","cfg","upscale_cfg","sampler",)
+        
+    RETURN_TYPES = (AnyType("*"),)
+    RETURN_NAMES = ("value",)
     FUNCTION = "main"
-    
-    def main(self, test_value, prefix_for_a, a_positive_prompt, a_negative_prompt, a_lora_strength, a_steps, a_cfg, a_sampler, b_positive_prompt, b_negative_prompt, b_lora_strength, b_steps, b_cfg, b_sampler):
 
-        if test_value.startswith(prefix_for_a):
-            return (a_positive_prompt, a_negative_prompt, a_lora_strength, a_steps, a_cfg, a_cfg-0.5, a_sampler,)
+    def main(self, should_output_a, a_value=None, b_value=None):
+        if should_output_a:
+            return (a_value,)
         else:
-            return (b_positive_prompt, b_negative_prompt, b_lora_strength, b_steps, b_cfg, b_cfg-0.5, b_sampler,)
+            return (b_value,)
+
+    def check_lazy_status(self, should_output_a, a_value=None, b_value=None):
+        if should_output_a:
+            return ["a_value"]
+        else:
+            return ["b_value"]
+
+class Siema_Dict_Set:
+
+    def __init__(self):
+        pass
+        
+    CATEGORY = "Siemas Nodes"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "key": ("STRING", {"default": ""}),
+                "value": (AnyType("*"), {"forceInput": True})
+            },
+            "optional": 
+            {
+                "dict": (AnyType("*"), {"forceInput": True}),
+            }
+        }
+        
+    RETURN_TYPES = (AnyType("*"),)
+    RETURN_NAMES = ("dict",)
+    FUNCTION = "main"
+
+    def main(self, key, value, dict={}):
+
+        dict[key] = value
+
+        return (dict,)
+
+    @classmethod
+    def IS_CHANGED(self, key, value, dict={}):
+        return float("NaN")
+
+class Siema_Dict_Get:
+
+    def __init__(self):
+        pass
+        
+    CATEGORY = "Siemas Nodes"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "dict": (AnyType("*"), {"forceInput": True}),
+                "key": ("STRING", {"default": ""})
+            }
+        }
+        
+    RETURN_TYPES = (AnyType("*"), AnyType("*"),)
+    RETURN_NAMES = ("dict", "value",)
+    FUNCTION = "main"
+
+    def main(self, dict, key):
+        return (dict, dict[key])
+
+    @classmethod
+    def IS_CHANGED(self, dict, key):
+        return float("NaN")
 
 NODE_CLASS_MAPPINGS = {
     "Multiply Resolution (Siema)": Siema_Res_Multiply,
@@ -312,4 +370,6 @@ NODE_CLASS_MAPPINGS = {
     "String List (Siema)": Siema_String_List,
     "Multiple Replace (Siema)": Siema_Multiple_String_Replace,
     "Data Selector (Siema)": Siema_Data_Select,
+    "Dict Set (Siema)": Siema_Dict_Set,
+    "Dict Get (Siema)": Siema_Dict_Get,
 }
